@@ -1,0 +1,1 @@
+# loongson-cloud-binary-ci

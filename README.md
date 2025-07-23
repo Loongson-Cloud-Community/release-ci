@@ -1,1 +1,1 @@
-# loongson-cloud-binary-ci
+# release-ci

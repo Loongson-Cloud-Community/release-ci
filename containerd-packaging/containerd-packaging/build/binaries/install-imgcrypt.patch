@@ -1,0 +1,13 @@
+diff --git a/script/setup/install-imgcrypt b/script/setup/install-imgcrypt
+index 108a14b..f44c7e9 100755
+--- a/script/setup/install-imgcrypt
++++ b/script/setup/install-imgcrypt
+@@ -29,6 +29,8 @@ TMPROOT=$(mktemp -d)
+ git clone "${IMGCRYPT_REPO}" "${TMPROOT}"/imgcrypt
+ pushd "${TMPROOT}"/imgcrypt
+ git checkout "${IMGCRYPT_VERSION}"
++go get -u golang.org/x/sys@v0.1.0
++go mod vendor
+ make
+ make containerd-release -e DESTDIR="${DESTDIR}/usr/local"
+ 

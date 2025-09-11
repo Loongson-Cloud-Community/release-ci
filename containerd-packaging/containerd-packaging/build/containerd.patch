@@ -1,0 +1,42 @@
+diff --git a/scripts/checkout.sh b/scripts/checkout.sh
+index baa8f59..4032751 100755
+--- a/scripts/checkout.sh
++++ b/scripts/checkout.sh
+@@ -51,6 +51,37 @@ checkout() (
+ 	fi
+ 	git -C "$SRC" fetch --update-head-ok --depth 1 origin "$REF_FETCH"
+ 	git -C "$SRC" checkout -q "$REF"
++	case "$SRC" in
++		"src/github.com/opencontainers/runc")
++			if [ -f "$SRC/libcontainer/seccomp/patchbpf/enosys_linux.go" ]; then
++				if ! grep -q "LOONGARCH64" "$SRC/libcontainer/seccomp/patchbpf/enosys_linux.go"; then
++					CURRENT_DIR=$(pwd)
++					cd "$SRC"
++					curl -sSL https://raw.githubusercontent.com/Loongson-Cloud-Community/shell_store/refs/heads/main/loong64-fix.sh | bash
++					go get -u github.com/seccomp/libseccomp-golang@v0.10.1-0.20240814065753-28423ed7600d
++					go mod vendor
++					sed -i "s@--dirty @@g" Makefile
++					cd "$CURRENT_DIR"
++				fi
++			fi
++			;;
++		"src/github.com/containerd/containerd")
++			if [ -f "$SRC/vendor/github.com/cilium/ebpf/internal/endian_le.go" ]; then
++				if ! grep -q "arm64 || loong64" "$SRC/vendor/github.com/cilium/ebpf/internal/endian_le.go"; then
++					sed -i "s@|| arm64@|| arm64 || loong64@g" "$SRC/vendor/github.com/cilium/ebpf/internal/endian_le.go"
++				fi
++			fi
++			if [ -f "$SRC/vendor/github.com/cilium/ebpf/internal/endian_le.go" ]; then
++				if ! grep -q "riscv64 loong64" "$SRC/vendor/github.com/cilium/ebpf/internal/endian_le.go"; then
++					sed -i "s@ppc64le riscv64@ppc64le riscv64 loong64@g" "$SRC/vendor/github.com/cilium/ebpf/internal/endian_le.go"
++				fi
++			fi
++			sed -i "s@--dirty='.m' @@g" "$SRC/Makefile"
++			sed -i 's@$(shell if ! git diff --no-ext-diff --quiet --exit-code; then echo .m; fi)@@g' "$SRC/Makefile"
++			;;
++		*) echo "None";
++			;;
++	esac
+ )
+ 
+ # Only execute checkout function above if this file is executed, not sourced from another script

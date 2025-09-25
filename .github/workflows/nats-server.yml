@@ -5,16 +5,16 @@ on:
         - cron: '0 16 * * *'
     workflow_dispatch:
 
-    jobs:
-        ci:
-        if: github.repository == 'Loongson-Cloud-Community/container-ci'
-        runs-on: self-hosted
-        steps:
-            - name: Checkout Code
-              uses: actions/checkout@v3
+jobs:
+    ci:
+    if: github.repository == 'Loongson-Cloud-Community/release-ci'
+    runs-on: self-hosted
+    steps:
+        - name: Checkout Code
+          uses: actions/checkout@v3
 
-            - name: Run ci.sh
-              run: |
-                date
-                pushd nats-io/nats-server && ./ci.sh && pop
+        - name: Run ci.sh
+          run: |
+            date
+            pushd nats-io/nats-server && ./ci.sh && pop
 
